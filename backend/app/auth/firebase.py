@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import firebase_admin
@@ -20,11 +21,15 @@ class FirebaseTokenVerifier:
         try:
             return firebase_admin.get_app(self._settings.firebase_app_name)
         except ValueError:
-            credential = (
-                credentials.Certificate(self._settings.firebase_credentials_path)
-                if self._settings.firebase_credentials_path
-                else credentials.ApplicationDefault()
-            )
+            # Priority: JSON env var > file path > application default
+            if self._settings.firebase_credentials_json:
+                cred_dict = json.loads(self._settings.firebase_credentials_json)
+                credential = credentials.Certificate(cred_dict)
+            elif self._settings.firebase_credentials_path:
+                credential = credentials.Certificate(self._settings.firebase_credentials_path)
+            else:
+                credential = credentials.ApplicationDefault()
+
             options: dict[str, str] = {}
             if self._settings.firebase_project_id:
                 options["projectId"] = self._settings.firebase_project_id

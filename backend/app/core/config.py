@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     default_compare_candidate_regions: str = "us-east-1,us-west-2,eu-west-1"
     firebase_project_id: str | None = None
     firebase_credentials_path: str | None = None
+    firebase_credentials_json: str | None = None
     firebase_app_name: str = "smart-cloud-cost-estimator"
 
     model_config = SettingsConfigDict(
